@@ -12,5 +12,20 @@ var Jugador = {
   vidas: 5,
   // Hay que agregar lo que falte al jugador: movimientos, perdida de vidas,
   // y todo lo que haga falta para que cumpla con sus responsabilidades
+  moverse: function(x, y, direccion, orientacion) {
 
+    if (this.sprite !== direccion) {
+      this.sprite = direccion;
+      this.ancho = orientacion[0];
+      this.alto = orientacion[1];
+    }
+
+    this.x = x;
+    this.y = y;
+  },
+  perderVida: function() {
+    if (this.vidas > 0) {
+      this.vidas--;
+    }
+  }
 }

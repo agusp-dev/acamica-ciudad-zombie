@@ -20,8 +20,16 @@ var Juego = {
   obstaculosCarretera: [
     /*Aca se van a agregar los obstaculos visibles. Tenemos una valla horizontal
     de ejemplo, pero podras agregar muchos mas. */
-    new Obstaculo('imagenes/valla_horizontal.png', 70, 430, 30, 30, 1)
+    new Obstaculo('imagenes/valla_horizontal.png', 70, 430, 30, 30, 1),
 
+    new Obstaculo('imagenes/valla_vertical.png', 90, 270, 30, 30, 1),
+
+    new Obstaculo('imagenes/valla_vertical.png', 230, 380, 30, 30, 1),
+    new Obstaculo('imagenes/valla_vertical.png', 230, 410, 30, 30, 1),
+
+    new Obstaculo('imagenes/bache.png', 400, 460, 30, 30, 1),
+
+    new Obstaculo('imagenes/auto_verde_derecha.png', 360, 400, 30, 15, 1)
   ],
   /* Estos son los bordes con los que se puede chocar, por ejemplo, la vereda.
    Ya estan ubicados en sus lugares correspondientes. Ya aparecen en el mapa, ya
@@ -44,9 +52,24 @@ var Juego = {
   ],
   // Los enemigos se agregaran en este arreglo.
   enemigos: [
-
+    new ZombieCaminante("imagenes/zombie1.png", 80, 50, 10, 10, 0.4, {desdeX: 80, hastaX: 150, desdeY: 50, hastaY: 120}),
+    new ZombieCaminante("imagenes/zombie2.png", 480, 360, 10, 10, 0.5, {desdeX: 480, hastaX: 560, desdeY: 360, hastaY: 450}),
+    new ZombieCaminante("imagenes/zombie3.png", 760, 90, 10, 10, 0.1, {desdeX: 760, hastaX: 820, desdeY: 90, hastaY: 100}),
+    new ZombieCaminante("imagenes/zombie4.png", 850, 120, 10, 10, 0.1, {desdeX: 850, hastaX: 850, desdeY: 120, hastaY: 250}),
+    new ZombieCaminante("imagenes/zombie3.png", 770, 400, 10, 10, 0.3, {desdeX: 770, hastaX: 870, desdeY: 375, hastaY: 450})
   ]
+}
 
+var jugadorDireccion = {
+  arriba: '/imagenes/auto_rojo_arriba.png',
+  der: 'imagenes/auto_rojo_derecha.png',
+  abajo: 'imagenes/auto_rojo_abajo.png',
+  izq: 'imagenes/auto_rojo_izquierda.png'
+}
+
+var jugadorOrientacion = {
+  horizontal: [30, 15],
+  vertical: [15, 30]
 }
 
 /* Se cargan los recursos de las imagenes, para tener un facil acceso
@@ -85,6 +108,7 @@ Juego.obstaculos = function() {
 Juego.comenzar = function() {
   // Inicializar el canvas del juego
   Dibujante.inicializarCanvas(this.anchoCanvas, this.altoCanvas);
+
   /* El bucle principal del juego se llamara continuamente para actualizar
   los movimientos y el pintado de la pantalla. Sera el encargado de calcular los
   ataques, colisiones, etc*/
@@ -111,27 +135,40 @@ Juego.capturarMovimiento = function(tecla) {
   var movX = 0;
   var movY = 0;
   var velocidad = this.jugador.velocidad;
+  var orientacion;
 
   // El movimiento esta determinado por la velocidad del jugador
   if (tecla == 'izq') {
     movX = -velocidad;
+    direccion = jugadorDireccion.izq;
+    orientacion = jugadorOrientacion.horizontal;
   }
   if (tecla == 'arriba') {
     movY = -velocidad;
+    direccion = 'imagenes/auto_rojo_arriba.png';
+    orientacion = jugadorOrientacion.vertical;
   }
   if (tecla == 'der') {
     movX = velocidad;
+    direccion = 'imagenes/auto_rojo_derecha.png';
+    orientacion = jugadorOrientacion.horizontal;
   }
   if (tecla == 'abajo') {
     movY = velocidad;
+    direccion = 'imagenes/auto_rojo_abajo.png';
+    orientacion = jugadorOrientacion.vertical;
   }
 
+  var nuevaPosX = movX + this.jugador.x;
+  var nuevaPosY = movY + this.jugador.y;
+
   // Si se puede mover hacia esa posicion hay que hacer efectivo este movimiento
-  if (this.chequearColisiones(movX + this.jugador.x, movY + this.jugador.y)) {
+  if (this.chequearColisiones(nuevaPosX, nuevaPosY)) {
     /* Aca tiene que estar la logica para mover al jugador invocando alguno
     de sus metodos  */
 
     /* COMPLETAR */
+    this.jugador.moverse(nuevaPosX, nuevaPosY, direccion, orientacion);
   }
 };
 
@@ -141,12 +178,18 @@ Juego.dibujar = function() {
   //Se pinta la imagen de fondo segun el estado del juego
   this.dibujarFondo();
 
+  /**
+   * Se pinta el rectangulo de llegada.
+   */
+  Dibujante.dibujarRectangulo("gray", 760, 500, 126, 50);
+
 
   /* Aca hay que agregar la logica para poder dibujar al jugador principal
   utilizando al dibujante y los metodos que nos brinda.
   "Dibujante dibuja al jugador" */
 
   /* Completar */
+  Dibujante.dibujarEntidad(Juego.jugador);
 
   // Se recorren los obstaculos de la carretera pintandolos
   this.obstaculosCarretera.forEach(function(obstaculo) {
@@ -155,7 +198,7 @@ Juego.dibujar = function() {
 
   // Se recorren los enemigos pintandolos
   this.enemigos.forEach(function(enemigo) {
-    /* Completar */
+    Dibujante.dibujarEntidad(enemigo);
   });
 
   // El dibujante dibuja las vidas del jugador
@@ -174,6 +217,9 @@ un recorrido por los enemigos para dibujarlos en pantalla ahora habra que hacer
 una funcionalidad similar pero para que se muevan.*/
 Juego.moverEnemigos = function() {
   /* COMPLETAR */
+  this.enemigos.forEach(function(enemigo) {
+    enemigo.mover();
+  }, this);
 };
 
 /* Recorre los enemigos para ver cual esta colisionando con el jugador
@@ -200,10 +246,10 @@ Juego.chequearColisiones = function(x, y) {
   var puedeMoverse = true
   this.obstaculos().forEach(function(obstaculo) {
     if (this.intersecan(obstaculo, this.jugador, x, y)) {
-
+      console.log('chocan');
       /*COMPLETAR, obstaculo debe chocar al jugador*/
-
-      puedeMoverse = false
+      obstaculo.chocar(this.jugador);
+      puedeMoverse = false;
     }
   }, this)
   return puedeMoverse
