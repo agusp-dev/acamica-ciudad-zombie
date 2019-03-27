@@ -21,15 +21,15 @@ var Juego = {
     /*Aca se van a agregar los obstaculos visibles. Tenemos una valla horizontal
     de ejemplo, pero podras agregar muchos mas. */
     new Obstaculo('imagenes/valla_horizontal.png', 70, 430, 30, 30, 1),
-
     new Obstaculo('imagenes/valla_vertical.png', 90, 270, 30, 30, 1),
-
     new Obstaculo('imagenes/valla_vertical.png', 230, 380, 30, 30, 1),
     new Obstaculo('imagenes/valla_vertical.png', 230, 410, 30, 30, 1),
-
+    new Obstaculo('imagenes/valla_vertical.png', 230, 410, 30, 30, 1),
     new Obstaculo('imagenes/bache.png', 400, 460, 30, 30, 1),
-
-    new Obstaculo('imagenes/auto_verde_derecha.png', 360, 400, 30, 15, 1)
+    new Obstaculo('imagenes/bache.png', 150, 200, 30, 30, 1),
+    new Obstaculo('imagenes/bache.png', 280, 240, 30, 30, 1),
+    new Obstaculo('imagenes/auto_verde_derecha.png', 360, 400, 30, 15, 1),
+    new Obstaculo('imagenes/auto_verde_derecha.png', 430, 130, 30, 15, 1)
   ],
   /* Estos son los bordes con los que se puede chocar, por ejemplo, la vereda.
    Ya estan ubicados en sus lugares correspondientes. Ya aparecen en el mapa, ya
@@ -56,7 +56,10 @@ var Juego = {
     new ZombieCaminante("imagenes/zombie2.png", 480, 360, 10, 10, 0.5, {desdeX: 480, hastaX: 560, desdeY: 360, hastaY: 450}),
     new ZombieCaminante("imagenes/zombie3.png", 760, 90, 10, 10, 0.1, {desdeX: 760, hastaX: 820, desdeY: 90, hastaY: 100}),
     new ZombieCaminante("imagenes/zombie4.png", 850, 120, 10, 10, 0.1, {desdeX: 850, hastaX: 850, desdeY: 120, hastaY: 250}),
-    new ZombieCaminante("imagenes/zombie3.png", 770, 400, 10, 10, 0.3, {desdeX: 770, hastaX: 870, desdeY: 375, hastaY: 450})
+    new ZombieCaminante("imagenes/zombie3.png", 770, 400, 10, 10, 0.3, {desdeX: 770, hastaX: 870, desdeY: 375, hastaY: 450}),
+    new ZombieConductor("imagenes/tren_horizontal.png", 20, 325, 90, 30, 5, {desdeX: 16, hastaX: 850, desdeY: 325, hastaY: 325}, "h"),
+    new ZombieConductor("imagenes/tren_vertical.png", 644, 25, 30, 90, 1, {desdeX: 644, hastaX: 644, desdeY: 25, hastaY: 470}, "v"),
+    new ZombieConductor("imagenes/tren_vertical.png", 675, 25, 30, 90, 0.5, {desdeX: 675, hastaX: 675, desdeY: 25, hastaY: 470}, "v")
   ]
 }
 
@@ -210,8 +213,6 @@ Juego.dibujar = function() {
   }
 };
 
-
-
 /* Recorre los enemigos haciendo que se muevan. De la misma forma que hicimos
 un recorrido por los enemigos para dibujarlos en pantalla ahora habra que hacer
 una funcionalidad similar pero para que se muevan.*/
@@ -231,14 +232,14 @@ Juego.calcularAtaques = function() {
     if (this.intersecan(enemigo, this.jugador, this.jugador.x, this.jugador.y)) {
       /* Si el enemigo colisiona debe empezar su ataque
       COMPLETAR */
+      enemigo.comenzarAtaque(this.jugador);
     } else {
       /* Sino, debe dejar de atacar
       COMPLETAR */
+      enemigo.dejarDeAtacar(this.jugador);
     }
   }, this);
 };
-
-
 
 /* Aca se chequea si el jugador se peude mover a la posicion destino.
  Es decir, que no haya obstaculos que se interpongan. De ser asi, no podra moverse */
